@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>2048</title>
+
+<link rel="stylesheet" href="css/game2048.css">
+
+<script src="js/underscore-min.js"></script>
+<script src="js/jquery-3.2.1.min.js"></script>
+<script src="js/game2048.js"></script>
+
+<script>
+$(document).ready(function() {
+  $("#btnRight").click(function() {
+    moveBoxes(moveStrategies["right"]);
+  });
+  $("#btnDown").click(function() {
+    moveBoxes(moveStrategies["down"]);
+  });
+  $("#btnLeft").click(function() {
+    moveBoxes(moveStrategies["left"]);
+  });
+  $("#btnUp").click(function() {
+    moveBoxes(moveStrategies["up"]);
+  });
+
+  $(document).bind("keyup", function(e) {
+    switch (e.which) {
+      case 37: // LEFT
+        moveBoxes(moveStrategies["left"]);
+        break;
+      case 39: // RIGHT
+        moveBoxes(moveStrategies["right"]);
+        break;
+      case 38: // UP
+        moveBoxes(moveStrategies["up"]);
+        break;
+      case 40: // DOWN
+        moveBoxes(moveStrategies["down"]);
+        break;
+    }
+  });
+
+  addNewBox();
+  addNewBox();
+  updateDisplay();
+});
+</script>
+
+
+</head>
+<body>
+
+<div class="display-area">
+
+	<div class="b">
+		<div class="r r1">
+			<button class="c c1"></button>
+			<button class="c c2"></button>
+			<button class="c c3"></button>
+			<button class="c c4"></button>
+		</div>
+		<div class="r r2">
+			<button class="c c1"></button>
+			<button class="c c2"></button>
+			<button class="c c3"></button>
+			<button class="c c4"></button>
+		</div>
+		<div class="r r3">
+			<button class="c c1"></button>
+			<button class="c c2"></button>
+			<button class="c c3"></button>
+			<button class="c c4"></button>
+		</div>
+		<div class="r r4">
+			<button class="c c1"></button>
+			<button class="c c2"></button>
+			<button class="c c3"></button>
+			<button class="c c4"></button>
+		</div>
+	</div>
+
+
+	<div class="bpanel">
+		<button id="btnRight">Right</button>
+		<button id="btnDown">Down</button>
+		<div class="sep"></div>
+		<button id="btnLeft">Left</button>
+		<button id="btnUp">Up</button>
+	</div>
+
+	<div class="score-board">
+		<div class="label">Score</div>
+		<div class="sep"></div>
+		<div class="score"></div>
+	</div>
+
+</div>
+
+</body>
+</html>
