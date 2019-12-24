@@ -128,6 +128,7 @@ function moveBox(r1, c1, rowDelta, columnDelta) {
   r2 = r1 + rowDelta;
   c2 = c1 + columnDelta;
 
+  // new position r2:c2 is within bound
   if (r2 >= 1 && r2 <= 4 && c2 >= 1 && c2 <= 4) {
     num1 = boxes[r1-1][c1-1];
     num2 = boxes[r2-1][c2-1];
