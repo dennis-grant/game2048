@@ -31,26 +31,6 @@
 	font-weight: bold;
 }
 
-.bpanel {
-	display: flex;
-	flex-direction: row;
-	justify-content: flex-start;
-}
-
-.bpanel .sep {
-	width: 10px;
-}
-
-.bpanel button {
-	height: 70px;
-	width: 70px;
-	border-radius: 8px;
-	background-color: #4068a8;
-	font-weight: bold;
-	font-size: 18px;
-	color: #ffffff;
-}
-
 .score-board {
 	display: flex;
 	flex-direction: row;

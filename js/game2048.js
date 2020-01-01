@@ -42,72 +42,52 @@ var moveScores = [
 var score = 0;
 
 
-
-function updateDisplay() {
-  var displayVal;
-
-  _.each([1,2,3,4], function(r) {
-    _.each([1,2,3,4], function(c) {
-      displayVal = boxes[r-1][c-1] == 0 ? "" : boxes[r-1][c-1];
-      $(`.b .r${r} .c${c}`).text(displayVal);
-    });
+const updateDisplay = () => {
+  allBoxCoordinates().forEach(coordinate => {
+    let value = get(boxes, coordinate.r, coordinate.c);
+    let boxSelector = `.b .r${coordinate.r} .c${coordinate.c}`;
+    document.querySelector(boxSelector).textContent = (value === 0) ? "" : value;
   });
 
-  $(".score-board .score").text(score);
-}
+  document.querySelector(".score-board .score").textContent = score;
+};
 
-function resetMoveScores() {
-  _.each([1,2,3,4], function(r) {
-    _.each([1,2,3,4], function(c) {
-      moveScores[r-1][c-1] = 0;
-    });
+const resetMoveScores = () => {
+  allBoxCoordinates().forEach(coordinate => {
+    set(moveScores, coordinate.r, coordinate.c, 0)
   });
-}
+};
 
-function sumMoveScores() {
-  var sum = 0;
+const sumMoveScores = () => {
+  return allBoxCoordinates().reduce((sum, coordinate) => {
+    return (sum + get(moveScores, coordinate.r, coordinate.c));
+  }, 0);
+};
 
-  _.each([1,2,3,4], function(r) {
-    _.each([1,2,3,4], function(c) {
-      sum += moveScores[r-1][c-1];
-    });
-  });
+const checkGameOver = () => {
+  let empties = emptyBoxes();
+  let haveMatchingNeighbor = false
 
-  return sum;
-}
-
-function checkGameOver() {
-  var haveEmptyBox = false;
-  var haveMatchingNeighbor = false
-
-  _.each([1,2,3,4], function(r) {
-    _.each([1,2,3,4], function(c) {
-      // check for empty box
-      if (boxes[r-1][c-1] == 0) {
-        haveEmptyBox = true;
+  allBoxCoordinates().forEach(coordinate => {
+    adjacentCoordinates(coordinate.r, coordinate.c).forEach(adjCoordinate => {
+      if (haveMatchingNeighbor === false) {
+        haveMatchingNeighbor = get(boxes, coordinate.r, coordinate.c) === get(boxes, adjCoordinate.r, adjCoordinate.c);
       }
-
-      // check for matching neighbor
-      _.each([[r,c-1], [r-1,c], [r,c+1], [r+1,c]], function(neighbor) {
-        if (haveMatchingNeighbor == false && _.contains([1,2,3,4], neighbor[0]) && _.contains([1,2,3,4], neighbor[1])) {
-          haveMatchingNeighbor = (boxes[r-1][c-1] == boxes[neighbor[0]-1][neighbor[1]-1]);
-        }
-      });
     });
   });
 
-  if (haveEmptyBox == false && haveMatchingNeighbor == false) {
+  if (empties.length === 0 && haveMatchingNeighbor === false) {
   	alert("Game Over");
   }
-}
+};
 
-function moveBoxes(strategy) {
+const moveBoxes = (strategy) => {
   var moveCount = 0;
 
   resetMoveScores();
-  _.each(strategy.rowOrder, function(r) {
-    _.each(strategy.columnOrder, function(c) {
-      if (boxes[r-1][c-1] != 0) {
+  strategy.rowOrder.forEach(r => {
+    strategy.columnOrder.forEach(c => {
+      if (get(boxes, r, c) !== 0) {
         moveCount += moveBox(r, c, strategy.rowDelta, strategy.columnDelta);
       }
     });
@@ -121,52 +101,79 @@ function moveBoxes(strategy) {
   checkGameOver();
 }
 
-function moveBox(r1, c1, rowDelta, columnDelta) {
-  var r2, c2, num1, num2;
-  var moveCount = 0;
+const moveBox = (r1, c1, rowDelta, columnDelta) => {
+  let moveCount = 0;
+  let r2 = r1 + rowDelta;
+  let c2 = c1 + columnDelta;
 
-  r2 = r1 + rowDelta;
-  c2 = c1 + columnDelta;
+  if (inBounds(r2, c2) === false) {
+    return moveCount;
+  }
 
-  // new position r2:c2 is within bound
-  if (r2 >= 1 && r2 <= 4 && c2 >= 1 && c2 <= 4) {
-    num1 = boxes[r1-1][c1-1];
-    num2 = boxes[r2-1][c2-1];
-    if (num2 == 0) {
-      boxes[r2-1][c2-1] = num1;
-      boxes[r1-1][c1-1] = 0;
+  let boxValue1 = get(boxes, r1, c1);
+  let boxValue2 = get(boxes, r2, c2);
 
-      moveCount += 1;
-      moveCount += moveBox(r2, c2, rowDelta, columnDelta);
-    }
-    else if (num2 == num1 && moveScores[r2-1][c2-1] == 0) {
-      boxes[r2-1][c2-1] = num1 + num2;
-      boxes[r1-1][c1-1] = 0;
+  if (boxValue2 === 0) {
+    set(boxes, r2, c2, boxValue1);
+    set(boxes, r1, c1, 0);
 
-      moveCount += 1;
-      moveScores[r2-1][c2-1] += boxes[r2-1][c2-1];
-    }
+    moveCount += 1;
+    moveCount += moveBox(r2, c2, rowDelta, columnDelta);
+  }
+  else if (boxValue2 === boxValue1 && get(moveScores, r2, c2) === 0) {
+    set(boxes, r2, c2, boxValue1 + boxValue2);
+    set(boxes, r1, c1, 0);
+
+    moveCount += 1;
+    set(moveScores, r2, c2, get(moveScores, r2, c2) + get(boxes, r2, c2));
   }
 
   return moveCount;
-}
+};
 
-function addNewBox() {
-  var emptyBoxes = [];
+const addNewBox = () => {
+  let empties = emptyBoxes();
   var newPos;
 
-  _.each([1,2,3,4], function(r) {
-    _.each([1,2,3,4], function(c) {
-      if (boxes[r-1][c-1] == 0) {
-        emptyBoxes.push({r:r, c:c});
-      }
+  if (empties.length > 0) {
+    newPos = sample(empties);
+    set(boxes, newPos.r, newPos.c, sample([2,2,2,2,2,2,4]));
+  }
+
+  return empties.length > 0;
+};
+
+const get = (values, r, c) => inBounds(r, c) ? values[r - 1][c - 1] : -1;
+
+const set = (values, r, c, value) => {
+  if (inBounds(r, c)) {
+    values[r - 1][c - 1] = value;
+  }
+};
+
+const emptyBoxes = () => {
+  return allBoxCoordinates().filter(coordinate => (get(boxes, coordinate.r, coordinate.c) === 0));
+};
+
+const allBoxCoordinates = () => {
+  let coordinates = [];
+  [1,2,3,4].forEach(row => {
+    [1,2,3,4].forEach(col => {
+      coordinates.push({r: row, c: col});
     });
   });
 
-  if (_.size(emptyBoxes) > 0) {
-    newPos = _.sample(emptyBoxes);
-    boxes[newPos.r-1][newPos.c-1] = _.sample([2,2,2,2,2,2,4]);
-  }
+  return coordinates;
+};
 
-  return _.size(emptyBoxes) > 0;
-}
+const adjacentCoordinates = (r, c) => {
+  const coordinates = [{r: r, c: c - 1}, {r: r, c: c + 1}, {r: r - 1, c: c}, {r: r + 1, c: c}];
+  return coordinates.filter(coordinate => inBounds(coordinate.r, coordinate.c));
+};
+
+const inBounds = (r, c) => (r >= 1 && r <= 4 && c >= 1 && c <= 4);
+
+const sample = (arr) => {
+  let pos = (arr !== undefined && arr.length > 0) ? Math.floor((Math.random() * arr.length) + 1) : -1;
+  return (pos === -1) ? undefined : arr[pos - 1];
+};
