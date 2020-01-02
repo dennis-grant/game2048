@@ -30,6 +30,11 @@
 	font-size: 50px;
 	font-weight: bold;
 	border: solid 1px #E6C229;
+	transition-duration: 250ms;
+}
+
+.c.change {
+	color: #6610F2;
 }
 
 .score-board {

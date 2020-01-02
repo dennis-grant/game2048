@@ -121,14 +121,25 @@ const moveBox = (r1, c1, rowDelta, columnDelta) => {
     moveCount += moveBox(r2, c2, rowDelta, columnDelta);
   }
   else if (boxValue2 === boxValue1 && get(moveScores, r2, c2) === 0) {
-    set(boxes, r2, c2, boxValue1 + boxValue2);
     set(boxes, r1, c1, 0);
+    blink(r1, c1);
+
+    set(boxes, r2, c2, boxValue1 + boxValue2);
+    blink(r2, c2);
 
     moveCount += 1;
     set(moveScores, r2, c2, get(moveScores, r2, c2) + get(boxes, r2, c2));
   }
 
   return moveCount;
+};
+
+const blink = (r, c) => {
+  let boxSelector = `.b .r${r} .c${c}`;
+  document.querySelector(boxSelector).classList.add("change");
+  setTimeout(() => {
+    document.querySelector(boxSelector).classList.remove("change");
+  }, 250);
 };
 
 const addNewBox = () => {
