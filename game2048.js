@@ -45,7 +45,7 @@ var score = 0;
 const updateDisplay = () => {
   allBoxCoordinates().forEach(coordinate => {
     let value = get(boxes, coordinate.r, coordinate.c);
-    let boxSelector = `.b .r${coordinate.r} .c${coordinate.c}`;
+    let boxSelector = `.boxes .r${coordinate.r}.c${coordinate.c}`;
     document.querySelector(boxSelector).textContent = (value === 0) ? "" : value;
   });
 
@@ -135,7 +135,7 @@ const moveBox = (r1, c1, rowDelta, columnDelta) => {
 };
 
 const blink = (r, c) => {
-  let boxSelector = `.b .r${r} .c${c}`;
+  let boxSelector = `.boxes .r${r}.c${c}`;
   document.querySelector(boxSelector).classList.add("change");
   setTimeout(() => {
     document.querySelector(boxSelector).classList.remove("change");

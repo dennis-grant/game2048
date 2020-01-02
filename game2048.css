@@ -5,24 +5,19 @@
 	height: 650px;
 }
 
-.b {
-	display: flex;
-	flex-direction: column;
-	justify-content: space-around;
+.boxes {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	grid-gap: 2px;
 	background-color: #1A8FE3;
-	width: 545px;
-	height: 545px;
+	box-sizing: border-box;
+	width: 538px;
+	height: 538px;
+	padding: 2px;
 }
 
-.r {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-around;
-	width: 545px;
-	height: 130px;
-}
-
-.c {
+.col {
+	box-sizing: border-box;
 	height: 132px;
 	width: 132px;
 	background-color: #6610F2;
@@ -33,7 +28,7 @@
 	transition-duration: 250ms;
 }
 
-.c.change {
+.col.change {
 	color: #6610F2;
 }
 
